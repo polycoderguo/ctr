@@ -9,7 +9,7 @@ def split_train_validation_data_set(raw_train_file, train_file, validation_file,
         for count, line in enumerate(f):
             utility.counting_line(count)
     print "total lines: {0}".format(count)
-    train_samples_count = int(count * test_samples_rate)
+    train_samples_count = count - int(count * test_samples_rate)
     print "generate data set"
     with open(raw_train_file, "rb") as f:
         head = f.readline()
