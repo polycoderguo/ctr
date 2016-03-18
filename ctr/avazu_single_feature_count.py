@@ -1,9 +1,8 @@
 #count single dimension features
 from __future__ import absolute_import
-from ctr.comon import utility
+from ctr.common import utility
 from collections import defaultdict
 import pandas as pd
-import os
 
 
 def count_featurs(train_file, output_path):
@@ -33,4 +32,6 @@ def count_featurs(train_file, output_path):
 
 
 if __name__ == "__main__":
-    count_featurs("../data/t.csv", "../data")
+    import os
+    root = os.path.dirname(__file__)
+    count_featurs(os.path.join(root,"../data/t.csv"), os.path.join(root,"../data"))
