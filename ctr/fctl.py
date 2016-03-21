@@ -2,7 +2,8 @@ from __future__ import absolute_import
 from ctr.common import utility
 import numpy as np
 import os
-
+import cPickle
+import sys
 
 def load_feature_map(fname):
     features = []
@@ -37,44 +38,47 @@ class TrainStream(object):
 
 
 def sigmoid(inX):
-    t = 1.0 /(1+ np.exp(-inX))
+    t = 1.0 / (1.0 + np.exp(-inX))
     return t
 
 
-def ftrl(alpha, beta, lamba1, lamba2, fs, feature_map):
-    z = np.zeros((1, len(feature_map)))
-    n = np.zeros((1, len(feature_map)))
+def ftrl(alpha, beta, lamba1, lamba2, fs, feature_map, model_file):
+    z = np.zeros(len(feature_map))
+    n = np.zeros(len(feature_map))
+    w = np.zeros(len(feature_map))
+    logloss_counter = utility.LogLossCounter()
     for count, (click, features) in enumerate(fs):
         x = np.zeros((1, len(feature_map)))
-        w = np.zeros((len(feature_map), 1))
         no_zero_index = []
         for feature in features:
             try:
                 feature_index = feature_map[int(feature)]
                 no_zero_index.append(feature_index)
                 x[0, feature_index] = 1
-                if z[0, feature_index] > lamba1:
-                    t = (-1 / ((beta + np.sqrt(n[0, feature_index])) / alpha + lamba2)) * (z[0, feature_index] - np.sign(z[0, feature_index]) * lamba1)
-                    w[feature_index, 0] = t
-                    pass
+                if np.abs(z[feature_index]) > lamba1:
+                    t = (-1.0 / ((beta + np.sqrt(n[feature_index])) / alpha + lamba2)) * (z[feature_index] - np.sign(z[feature_index]) * lamba1)
+                    w[feature_index] = t
+                else:
+                    w[feature_index] = 0
             except Exception as e:
                 continue
-        p = sigmoid(x.dot(w)[0, 0])
-        if p > 0.4:
-            print p, click
+        p = sigmoid(x.dot(w)[0])
+        logloss_counter.count_logloss(p, click)
         for feature_index in no_zero_index:
             g = p - click
-            sigma = (1 / alpha) * (np.sqrt(n[0, feature_index] + np.exp2(g)) - np.sqrt(n[0, feature_index]))
-            w_i = w[feature_index, 0]
-            z[0, feature_index] += g - sigma * w_i
-            n[0, feature_index] += np.exp2(g)
-        utility.counting_line(count, 100000)
+            sigma = (1.0 / alpha) * (np.sqrt(n[feature_index] + np.exp2(g)) - np.sqrt(n[feature_index]))
+            w_i = w[feature_index]
+            z[feature_index] += g - sigma * w_i
+            n[feature_index] += np.exp2(g)
+    with open(model_file, "wb") as f:
+        f.write(cPickle.dumps(w))
 
 if __name__ == "__main__":
     root = os.path.dirname(__file__)
-    feature_map = load_feature_map(os.path.join(root, "../data/feature_map.txt"))
-    fs = TrainStream(os.path.join(root, "../data/train_features.txt"))
-    import time
-    t = time.time()
-    ftrl(1, 1, 0.1, 0.1, fs, feature_map)
-    print time.time() - t
+    feature_map = load_feature_map(os.path.join(root, "../data/app_feature_map.txt"))
+    fs = TrainStream(os.path.join(root, "../data/app_train_features.txt"))
+    try:
+        alpha, beta, lamba1, lamba2, model_file = sys.argv[1:]
+    except:
+        alpha, beta, lamba1, lamba2, model_file = 8, 1, 0.001, 0.001, "model.txt"
+    ftrl(float(alpha), float(beta), float(lamba1), float(lamba2), fs, feature_map, os.path.join(root, "../data/{0}").format(model_file))

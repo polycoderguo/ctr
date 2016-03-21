@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from ctr.common import utility
 from ctr.common.utility import CSVReader
 from collections import defaultdict
+import multiprocessing
+import os
 
 
 def map_features(features, feature_map):
@@ -16,16 +18,30 @@ def map_features(features, feature_map):
     return ",".join(t)
 
 
-def convert_feature(train_file, feature_file, map_file):
+def convert_feature(train_file, feature_file, map_file, startlines=0, maxlines=-1):
     reader = CSVReader(train_file)
+    reader.skip_rows(startlines)
     device_ip_count = defaultdict(int)
     device_id_count = defaultdict(int)
     user_count = defaultdict(int)
     user_hour_count = defaultdict(int)
-    ff = open(feature_file, "wb")
-    feature_map = {}
+    t = os.path.split(feature_file)
+    feature_file_app = os.path.join(t[0], 'app_' + t[1])
+    feature_file_site = os.path.join(t[0], 'site_' + t[1])
+    t = os.path.split(map_file)
+    map_file_app = os.path.join(t[0], 'app_' + t[1])
+    map_file_site = os.path.join(t[0], 'site_' + t[1])
+
+    ff_app = open(feature_file_app, "wb")
+    ff_site = open(feature_file_site, "wb")
+    feature_map_app = {}
+    feature_map_site = {}
+    count = 0
     while True:
+        if count >= maxlines:
+            break
         row = reader.read_row()
+        count += 1
         if row is None:
             break
         site_id = reader.read_row_data(row, "site_id")
@@ -55,6 +71,12 @@ def convert_feature(train_file, feature_file, map_file):
         user_count[user_id] += 1
         user_hour_count[user_id + '-' + hour] += 1
         smooth_user_count = user_hour_count[user_id + '-' + hour]
+        if is_app:
+            ff = ff_app
+            feature_map = feature_map_app
+        else:
+            ff = ff_site
+            feature_map = feature_map_site
         ff.write(reader.read_row_data(row, "click") + "," + map_features([
             'pub_id-' + pub_id,
             'pub_domain-' + pub_domain,
@@ -70,15 +92,53 @@ def convert_feature(train_file, feature_file, map_file):
             device_ip_count[device_ip] > 1000 and 'device_ip-' + device_ip or 'device_ip-less-' + str(device_ip_count[device_ip]),
             device_id_count[device_id] > 1000 and 'device_id-' + device_id or 'device_id-less-' + str(device_id_count[device_id]),
             smooth_user_count > 30 and 'smooth_user_hour_count-0' or 'smooth_user_hour_count-' + str(smooth_user_count),
-            str(user_count[user_id])
+            'user_count-' + str(user_count[user_id])
         ], feature_map) + "\r\n")
         utility.counting_line(reader.index)
-    ff.close()
-    with open(map_file, "wb") as f:
-        for k, v in feature_map.items():
+    ff_app.close()
+    ff_site.close()
+    with open(map_file_app, "wb") as f:
+        for k, v in feature_map_app.items():
             f.write("{0}\t{1}\t{2}\r\n".format(k, v[0], v[1]))
+    with open(map_file_site, "wb") as f:
+        for k, v in feature_map_site.items():
+            f.write("{0}\t{1}\t{2}\r\n".format(k, v[0], v[1]))
+
 
 if __name__ == "__main__":
     import os
     root = os.path.dirname(__file__)
-    convert_feature(os.path.join(root, "../data/t.csv"), os.path.join(root, "../data/train_features.txt"), os.path.join(root, "../data/feature_map.txt"))
+    process = []
+    train_file = os.path.join(root, "../data/t.csv")
+    total_lines = utility.count_file_lines(train_file)
+    print "total lines:", total_lines
+    thread = 4
+    for i in range(thread):
+        print "start thread {0}, from lines {1}".format(i,total_lines/thread * i)
+        p = multiprocessing.Process(target=convert_feature, args=(train_file, os.path.join(root, "../data/train_features_{0}.txt".format(i)), os.path.join(root, "../data/feature_map_{0}.txt".format(i)), total_lines/thread * i, total_lines/thread))
+        p.start()
+        process.append(p)
+    for p in process:
+        p.join()
+    print "merge train file"
+    for t in ("app", "site"):
+        with open(os.path.join(root, "../data/{0}_train_features.txt").format(t), "wb") as wf:
+            for i in range(thread):
+                print "merge {0} train file {1}".format(t, i)
+                with open(os.path.join(root, "../data/{0}_train_features_{1}.txt".format(t, i)), "rb") as f:
+                    for count, line in enumerate(f):
+                        wf.write(line)
+    for t in ("app", "site"):
+        feature_map = {}
+        with open(os.path.join(root, "../data/{0}_feature_map.txt").format(t), "wb") as wf:
+            for i in range(thread):
+                print "merge {0} map file {1}".format(t, i)
+                with open(os.path.join(root, "../data/{0}_feature_map_{1}.txt".format(t, i)), "rb") as f:
+                    for count, line in enumerate(f):
+                        try:
+                            items = line.strip().split("\t")
+                            feature_map[items[0]][1] += items[2]
+                        except:
+                            feature_map[items[0]] = [items[1], int(items[2])]
+            for k, v in feature_map.items():
+                wf.write("{0}\t{1}\t{2}\r\n".format(k, v[0], v[1]))
