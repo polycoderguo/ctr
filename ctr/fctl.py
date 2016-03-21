@@ -24,7 +24,7 @@ class TrainStream(object):
     def __init__(self, filename, start_lines = 0, max_lines = -1):
         self.f = open(filename, "rb")
         for i in xrange(start_lines):
-            self.f.readlines()
+            self.f.readline()
         self.count = 0
         self.max_lines = max_lines
 
