@@ -25,8 +25,11 @@ class LogLossCounter(object):
         loss = y * np.log(p) + (1-y) * np.log(1 - p)
         self.sum += loss
         if self.count % report_interval == 0:
-            logloss = (-1.0 / float(self.count)) * self.sum
-            print "process line {0}, logloss={1}......{2}".format(self.count, logloss, time.strftime("%Y-%m-%d %H:%M:%S"))
+            self.output()
+
+    def output(self):
+        logloss = (-1.0 / float(self.count)) * self.sum
+        print "process line {0}, logloss={1}......{2}".format(self.count, logloss, time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 def is_app(site_id):
