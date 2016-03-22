@@ -109,36 +109,38 @@ if __name__ == "__main__":
     import os
     root = os.path.dirname(__file__)
     process = []
-    train_file = os.path.join(root, "../data/t.csv")
+    train_file = os.path.join(root, "../data/v.csv")
     total_lines = utility.count_file_lines(train_file)
     print "total lines:", total_lines
     thread = 4
     for i in range(thread):
         print "start thread {0}, from lines {1}".format(i,total_lines/thread * i)
-        p = multiprocessing.Process(target=convert_feature, args=(train_file, os.path.join(root, "../data/train_features_{0}.txt".format(i)), os.path.join(root, "../data/feature_map_{0}.txt".format(i)), total_lines/thread * i, total_lines/thread))
+        p = multiprocessing.Process(target=convert_feature, args=(train_file, os.path.join(root, "../data/validate_features_{0}.txt".format(i)), os.path.join(root, "../data/feature_map_{0}.txt".format(i)), total_lines/thread * i, total_lines/thread))
         p.start()
         process.append(p)
     for p in process:
         p.join()
     print "merge train file"
     for t in ("app", "site"):
-        with open(os.path.join(root, "../data/{0}_train_features.txt").format(t), "wb") as wf:
+        with open(os.path.join(root, "../data/{0}_validate_features.txt").format(t), "wb") as wf:
             for i in range(thread):
                 print "merge {0} train file {1}".format(t, i)
-                with open(os.path.join(root, "../data/{0}_train_features_{1}.txt".format(t, i)), "rb") as f:
+                with open(os.path.join(root, "../data/{0}_validate_features_{1}.txt".format(t, i)), "rb") as f:
                     for count, line in enumerate(f):
                         wf.write(line)
-    for t in ("app", "site"):
-        feature_map = {}
-        with open(os.path.join(root, "../data/{0}_feature_map.txt").format(t), "wb") as wf:
-            for i in range(thread):
-                print "merge {0} map file {1}".format(t, i)
-                with open(os.path.join(root, "../data/{0}_feature_map_{1}.txt".format(t, i)), "rb") as f:
-                    for count, line in enumerate(f):
-                        try:
-                            items = line.strip().split("\t")
-                            feature_map[items[0]][1] += items[2]
-                        except:
-                            feature_map[items[0]] = [items[1], int(items[2])]
-            for k, v in feature_map.items():
-                wf.write("{0}\t{1}\t{2}\r\n".format(k, v[0], v[1]))
+    if 0 > 1:
+
+        for t in ("app", "site"):
+            feature_map = {}
+            with open(os.path.join(root, "../data/{0}_feature_map.txt").format(t), "wb") as wf:
+                for i in range(thread):
+                    print "merge {0} map file {1}".format(t, i)
+                    with open(os.path.join(root, "../data/{0}_feature_map_{1}.txt".format(t, i)), "rb") as f:
+                        for count, line in enumerate(f):
+                            try:
+                                items = line.strip().split("\t")
+                                feature_map[items[0]][1] += items[2]
+                            except:
+                                feature_map[items[0]] = [items[1], int(items[2])]
+                for k, v in feature_map.items():
+                    wf.write("{0}\t{1}\t{2}\r\n".format(k, v[0], v[1]))

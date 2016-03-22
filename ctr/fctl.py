@@ -101,10 +101,10 @@ if __name__ == "__main__":
     total_samples = utility.count_file_lines(train_file)
     train_samples = int(total_samples * 0.8)
     feature_map = load_feature_map(map_file)
-    fs = TrainStream(train_file, max_lines=train_samples)
+    fs = TrainStream(train_file)
     vs = TrainStream(train_file, start_lines=train_samples)
     try:
         alpha, beta, lamba1, lamba2, model_file = sys.argv[1:]
     except:
-        alpha, beta, lamba1, lamba2, model_file = 8, 1, 0.001, 0.001, "model.txt"
+        alpha, beta, lamba1, lamba2, model_file = 1, 1, 0.001, 0.001, "model.txt"
     ftrl(float(alpha), float(beta), float(lamba1), float(lamba2), fs, vs, feature_map, os.path.join(root, "../data/{0}").format(model_file))
