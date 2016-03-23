@@ -151,7 +151,7 @@ class FeatureMap(object):
             return self.feature_index_map[str_feature]
         except:
             self.index += 1
-            self.feature_index_map[str_feature]= str(self.index)
+            self.feature_index_map[str_feature]=str(self.index)
             self.features.append(str_feature)
             return self.feature_index_map[str_feature]
 
@@ -160,7 +160,7 @@ class FeatureMap(object):
         for feature in features:
             try:
                 t.append(self.get_feature_id(feature))
-            except:
+            except Exception as e:
                 pass
         return seq.join(t)
 
@@ -200,7 +200,7 @@ class FeatureStream(object):
             t = self.f.readline().strip()
             assert len(t) > 0
             t = t.split(self.seq)
-            return int(t[0]), (int(x) for x in t[1])
+            return int(t[0]), (int(x) for x in t[1:])
         except:
             raise StopIteration()
 

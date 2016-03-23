@@ -87,7 +87,11 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
             device_ip_count[device_ip] > 1000 and 'device_ip-' + device_ip or 'device_ip-less-' + str(device_ip_count[device_ip]),
             device_id_count[device_id] > 1000 and 'device_id-' + device_id or 'device_id-less-' + str(device_id_count[device_id]),
             smooth_user_count > 30 and 'smooth_user_hour_count-0' or 'smooth_user_hour_count-' + str(smooth_user_count),
-            'user_count-' + str(user_count[user_id])
+            'user_count-' + str(user_count[user_id]),
+            'device_model-app_domain-' + device_model  + "-" + pub_domain,
+            'device_conn_type-app_domain-' + device_conn_type + "-" + pub_domain,
+            'hour-app_domain-' + hour[-2:] + "-" + pub_domain,
+            'app_domain-banner_pos-' + pub_domain + "-" + banner_pos
         ]) + "\r\n")
         utility.progress(count)
     ff_app.close()
@@ -97,7 +101,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
 
 if __name__ == "__main__":
     print "Train features....."
-    convert_feature(utility.get_date_file_path("t.csv"), utility.get_date_file_path("train_features.csv"), utility.get_date_file_path("feature_map.json"))
+    convert_feature(utility.get_date_file_path("t.csv"), utility.get_date_file_path("train_features_v2.csv"), utility.get_date_file_path("feature_map_v2.json"))
     print "Test features....."
-    convert_feature(utility.get_date_file_path("v.csv"), utility.get_date_file_path("test_features.csv"),
-                    utility.get_date_file_path("feature_map.json"), shared_app_map_file=utility.get_date_file_path("app_feature_map.json"), shared_site_map_file=utility.get_date_file_path("site_feature_map.json"))
+    convert_feature(utility.get_date_file_path("v.csv"), utility.get_date_file_path("test_features_v2.csv"),
+                    utility.get_date_file_path("feature_map_v2.json"), shared_app_map_file=utility.get_date_file_path("app_feature_map_v2.json"), shared_site_map_file=utility.get_date_file_path("site_feature_map_v2.json"))
