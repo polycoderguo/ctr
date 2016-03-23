@@ -1,6 +1,6 @@
 #count single dimension features
 from __future__ import absolute_import
-from ctr.common import utility
+from ctr_old.common import utility
 from collections import defaultdict
 import pandas as pd
 

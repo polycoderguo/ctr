@@ -1,9 +1,9 @@
 from __future__ import absolute_import
-from ctr.fctl import load_feature_map, TrainStream, sigmoid
+from ctr_old.fctl import load_feature_map, TrainStream, sigmoid
 import numpy as np
 import os
 import cPickle
-from ctr.common import utility
+from ctr_old.common import utility
 
 
 def validation(map_file, modelfile, validate_file):

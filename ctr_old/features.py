@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-from ctr.common import utility
-from ctr.common.utility import CSVReader
+from ctr_old.common import utility
+from ctr_old.common.utility import CSVReader
 from collections import defaultdict
 import multiprocessing
 import os

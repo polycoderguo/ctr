@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from ctr.common import utility
+from ctr_old.common import utility
 
 
 def split_train_validation_data_set(raw_train_file, train_file, validation_file, test_samples_rate):
