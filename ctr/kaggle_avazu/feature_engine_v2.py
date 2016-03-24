@@ -88,10 +88,12 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
             device_id_count[device_id] > 1000 and 'device_id-' + device_id or 'device_id-less-' + str(device_id_count[device_id]),
             smooth_user_count > 30 and 'smooth_user_hour_count-0' or 'smooth_user_hour_count-' + str(smooth_user_count),
             'user_count-' + str(user_count[user_id]),
-            'device_model-app_domain-' + device_model  + "-" + pub_domain,
-            'device_conn_type-app_domain-' + device_conn_type + "-" + pub_domain,
-            'hour-app_domain-' + hour[-2:] + "-" + pub_domain,
-            'app_domain-banner_pos-' + pub_domain + "-" + banner_pos
+            'device_model-pub_domain-' + device_model + "-" + pub_domain,
+            'device_model-pub_category-' + device_model + "-" + pub_category,
+            'device_conn_type-pub_domain-' + device_conn_type + "-" + pub_domain,
+            'device_conn_type-pub_category-' + device_conn_type + "-" + pub_category,
+            'hour-pub_domain-' + hour[-2:] + "-" + pub_domain,
+            'pub_domain-banner_pos-' + pub_domain + "-" + banner_pos,
         ]) + "\r\n")
         utility.progress(count)
     ff_app.close()

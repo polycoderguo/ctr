@@ -2,6 +2,23 @@ import json
 import time
 import os
 import numpy as np
+from collections import defaultdict
+
+
+def wise_mk_dir(path):
+    if path == "":
+        return
+    if os.path.exists(path):
+        return
+    p, c = os.path.split(path)
+    if not os.path.exists(p):
+        wise_mk_dir(p)
+    os.mkdir(path)
+
+
+def wise_mk_dir_for_file(filepath):
+    p = os.path.dirname(filepath)
+    wise_mk_dir(p)
 
 
 def format_rate(a, b):
@@ -37,7 +54,11 @@ class ValidateHelper(object):
                 self.predict_un_clicked_wrong += 1
             else:
                 self.predict_un_clicked_correct += 1
-        self.loss += clicked * np.log(p) + (1 - clicked) * np.log(1 - p)
+        #self.loss += clicked * np.log(p) + (1 - clicked) * np.log(1 - p)
+        if clicked:
+            self.loss += np.log(p)
+        else:
+                self.loss += np.log(1-p)
         avg = self.clicked / float(self.total)
         if avg > 0:
             self.avg_loss += clicked * np.log(avg) + (1 - clicked) * np.log(1 - avg)
@@ -45,8 +66,14 @@ class ValidateHelper(object):
             self.out_put()
 
     def out_put(self):
-        logloss = (-1.0 / float(self.total)) * self.loss
-        avg_logloss = (-1.0 / float(self.total)) * self.avg_loss
+        if self.loss != 0:
+            logloss = (-1.0 / float(self.total)) * self.loss
+        else:
+            logloss = 0
+        if self.avg_loss != 0:
+            avg_logloss = (-1.0 / float(self.total)) * self.avg_loss
+        else:
+            avg_logloss = 0
         print "total = {0}, clicked = {1}, click_rate = {2}, predict_clicked_correct = {3}, predict_clicked_wrong = {4}" \
               ", predict_un_clicked_correct = {5}, predict_un_clicked_wrong = {6}, precision = {7}, recall = {8}, " \
               "logloss = {9}, avgloss = {10}, time = {11}"\
@@ -185,9 +212,14 @@ class FeatureMap(object):
 
 class FeatureStream(object):
     def __init__(self, feature_map_filename, feature_data_filename, seq=","):
-        self.feature_map = FeatureMap.load(feature_map_filename)
-        self.f = open(feature_data_filename, "rb")
+        self.feature_map_filename = feature_map_filename
+        self.feature_data_filename = feature_data_filename
         self.seq = seq
+        self.reset()
+
+    def reset(self):
+        self.feature_map = FeatureMap.load(self.feature_map_filename)
+        self.f = open(self.feature_data_filename, "rb")
 
     def __iter__(self):
         return self
@@ -200,12 +232,38 @@ class FeatureStream(object):
             t = self.f.readline().strip()
             assert len(t) > 0
             t = t.split(self.seq)
-            return int(t[0]), (int(x) for x in t[1:])
+            return int(t[0]), [int(x) for x in t[1:]]
         except:
             raise StopIteration()
+
 
 DEFAULT_DATA_PATH = os.path.join(os.path.dirname(__file__), "../../data")
 
 
 def get_date_file_path(filename):
     return os.path.join(DEFAULT_DATA_PATH, filename)
+
+
+def count_csv_values_by_field(filename, output_dirname, seq=","):
+    fields_values_map = defaultdict(dict)
+    with open(filename, "rb") as f:
+        head = f.readline().strip().split(seq)
+        for count, line in enumerate(f):
+            t = line.strip().split(seq)
+            if len(line) == 0:
+                continue
+            for index, item in enumerate(t):
+                try:
+                    fields_values_map[head[index]][item] += 1
+                except:
+                    fields_values_map[head[index]][item] = 1
+            progress(count)
+    for field, v in fields_values_map.iteritems():
+        file_path = os.path.join(output_dirname, field)
+        wise_mk_dir_for_file(file_path)
+        with open(file_path, "wb") as f:
+            t = v.items()
+            t.sort(key=lambda x: x[-1])
+            t.reverse()
+            for item, count in t:
+                f.write("{0}\t{1}\r\n".format(item, count))
