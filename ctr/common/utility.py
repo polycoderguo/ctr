@@ -1,9 +1,9 @@
 import json
-import time
+import datetime
 import os
 import numpy as np
 from collections import defaultdict
-
+import time
 
 def wise_mk_dir(path):
     if path == "":
@@ -267,3 +267,28 @@ def count_csv_values_by_field(filename, output_dirname, seq=","):
             t.reverse()
             for item, count in t:
                 f.write("{0}\t{1}\r\n".format(item, count))
+
+
+class Timer(object):
+    def __init__(self):
+        self.tm = 0
+        self.count = 0
+        self.total_time = 0.0
+
+    def reset(self):
+        self.tm = 0
+        self.count = 0
+        self.total_time = 0.0
+
+    def update_begin(self):
+        self.tm = datetime.datetime.utcnow()
+
+    def update_end(self):
+        self.total_time += (datetime.datetime.utcnow() - self.tm).total_seconds()
+        self.count += 1
+
+    def avg_cost_time(self):
+        return self.count > 0 and self.total_time / float(self.count) or 0
+
+    def total_cost_time(self):
+        return self.total_time

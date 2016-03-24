@@ -32,8 +32,7 @@ class Fctl(object):
             for feature_index in features:
                 g = p - click
                 sigma = (1.0 / alpha) * (np.sqrt(self.n[feature_index] + g*g) - np.sqrt(self.n[feature_index]))
-                w_i = self.w[feature_index]
-                self.z[feature_index] += g - sigma * w_i
+                self.z[feature_index] += g - sigma * self.w[feature_index]
                 self.n[feature_index] += g*g
             validate_helper.update(p, click, 0.5)
         validate_helper.out_put()
