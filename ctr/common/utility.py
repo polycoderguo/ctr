@@ -1,9 +1,10 @@
 import json
 import datetime
 import os
-import numpy as np
 from collections import defaultdict
 import time
+import math
+
 
 def wise_mk_dir(path):
     if path == "":
@@ -56,12 +57,12 @@ class ValidateHelper(object):
                 self.predict_un_clicked_correct += 1
         #self.loss += clicked * np.log(p) + (1 - clicked) * np.log(1 - p)
         if clicked:
-            self.loss += np.log(p)
+            self.loss += math.log(p)
         else:
-                self.loss += np.log(1-p)
+                self.loss += math.log(1-p)
         avg = self.clicked / float(self.total)
         if avg > 0:
-            self.avg_loss += clicked * np.log(avg) + (1 - clicked) * np.log(1 - avg)
+            self.avg_loss += clicked * math.log(avg) + (1 - clicked) * math.log(1 - avg)
         if self.total % self.report_interval == 0:
             self.out_put()
 
@@ -292,3 +293,15 @@ class Timer(object):
 
     def total_cost_time(self):
         return self.total_time
+
+def sigmoid(x):
+  return 1.0 / (1.0 + math.exp(-x))
+
+
+def sign(x):
+    if x < 0:
+        return -1
+    elif x == 0:
+        return 0
+    else:
+        return 1
