@@ -70,7 +70,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
         banner_pos = row.get("banner_pos")
         device_model = row.get("device_model")
         device_conn_type = row.get("device_conn_type")
-        C14, C17, C20, C21 = row.get("C1"), row.get("C17"), row.get("C20"), row.get("C21")
+        C14, C17, C20, C21 = row.get("C14"), row.get("C17"), row.get("C20"), row.get("C21")
         hour = row.get("hour")
         device_id = row.get("device_id")
         #device_id_count[device_id] += 1
@@ -85,8 +85,6 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
             user_click_history = history[user_id]['history']
             if is_train:
                 history[user_id]['buffer'] += row.get('click')
-            else:
-                user_click_history = ''
         else:
             user_id = device_ip + device_model
             user_click_history = ''
