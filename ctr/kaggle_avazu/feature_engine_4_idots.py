@@ -11,11 +11,20 @@ def is_app(row):
 def has_id_info(row):
     return False if row.get("device_id") == 'a99f214a' else True
 
+
+def get_user_id(row):
+    if has_id_info(row):
+        user_id = 'id-' + row.get("device_id")
+    else:
+        user_id = 'ip-' + row.get("device_ip") + '-' + row.get("device_model")
+    return user_id
+
 device_ip_count = defaultdict(int)
 device_id_count = defaultdict(int)
 user_count = defaultdict(int)
 user_hour_count = defaultdict(int)
 history = defaultdict(lambda: {'history': '', 'buffer': '', 'prev_hour': ''})
+
 
 def scan(train_file_name):
     reader = utility.CSVReader(train_file_name)
@@ -24,11 +33,7 @@ def scan(train_file_name):
         device_id_count[device_id] += 1
         device_ip = row.get("device_ip")
         device_ip_count[device_ip] += 1
-        device_model = row.get("device_model")
-        if has_id_info(row):
-            user_id = 'id-' + device_id
-        else:
-            user_id = 'ip-' + device_ip + '-' + device_model
+        user_id = get_user_id(row)
         user_count[user_id] += 1
         hour = row.get("hour")
         user_hour_count[user_id + '-' + hour] += 1
@@ -79,8 +84,8 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
         #device_id_count[device_id] += 1
         device_ip = row.get("device_ip")
         #device_ip_count[device_ip] += 1
+        user_id = get_user_id(row)
         if has_id_info(row):
-            user_id = device_id
             if history[user_id]['prev_hour'] != row.get('hour'):
                 history[user_id]['history'] = (history[user_id]['history'] + history[user_id]['buffer'])[-4:]
                 history[user_id]['buffer'] = ''
