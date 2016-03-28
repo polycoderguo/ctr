@@ -78,12 +78,13 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
         #device_ip_count[device_ip] += 1
         if has_id_info(row):
             user_id = device_id
+            if history[user_id]['prev_hour'] != row.get('hour'):
+                history[user_id]['history'] = (history[user_id]['history'] + history[user_id]['buffer'])[-4:]
+                history[user_id]['buffer'] = ''
+                history[user_id]['prev_hour'] = row.get('hour')
+            user_click_history = history[user_id]['history']
             if is_train:
-                if history[user_id]['prev_hour'] != row.get('hour'):
-                    history[user_id]['history'] = (history[user_id]['history'] + history[user_id]['buffer'])[-4:]
-                    history[user_id]['buffer'] = ''
-                    history[user_id]['prev_hour'] = row.get('hour')
-                user_click_history = history[user_id]['history']
+                history[user_id]['buffer'] += row.get('click')
             else:
                 user_click_history = ''
         else:
