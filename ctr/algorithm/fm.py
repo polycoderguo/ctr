@@ -17,13 +17,13 @@ class FM(object):
     def v_index(self, i, j):
         return i * self.k + j
 
-    def train(self, feature_stream, _lambda, eta, init=False):
+    def train(self, feature_stream, _lambda, eta, init=False, report_interval=1000000):
         if init:
             self.w_0 = 0
             self.W = [0 for _ in xrange(self.total_features)]
             coef = 0.5 / math.sqrt(self.k)
             self.V = [coef * random.random() for _ in xrange(self.total_features * self.k)]
-        validate_helper = utility.ValidateHelper()
+        validate_helper = utility.ValidateHelper(report_interval=report_interval)
         validate_helper.out_put()
         for count, (click, features) in enumerate(feature_stream):
             y = click > 0 and 1.0 or -1.0
@@ -54,9 +54,10 @@ class FM(object):
                 print p, t
             validate_helper.update(p, click, 0.5)
         validate_helper.out_put()
+        return validate_helper.get_log_loss()
 
-    def test(self, feature_stream, p_threshold=0.5):
-        validate_helper = utility.ValidateHelper()
+    def test(self, feature_stream, p_threshold=0.5,report_interval=1000000):
+        validate_helper = utility.ValidateHelper(report_interval=report_interval)
         for count, (click, features) in enumerate(feature_stream):
             t = self.w_0
             field_count = len(features)
@@ -75,6 +76,7 @@ class FM(object):
             p = utility.sigmoid(t)
             validate_helper.update(p, click, p_threshold)
         validate_helper.out_put()
+        return validate_helper.get_log_loss()
 
     def dump_model(self, filename):
         with open(filename, "wb") as f:

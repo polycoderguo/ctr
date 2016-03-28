@@ -64,8 +64,15 @@ class ValidateHelper(object):
         avg = self.clicked / float(self.total)
         if avg > 0:
             self.avg_loss += clicked * math.log(avg) + (1 - clicked) * math.log(1 - avg)
-        if self.total % self.report_interval == 0:
+        if self.report_interval >0 and self.total % self.report_interval == 0:
             self.out_put()
+
+    def get_log_loss(self):
+        if self.loss != 0:
+            logloss = (-1.0 / float(self.total)) * self.loss
+        else:
+            logloss = 0
+        return logloss
 
     def out_put(self):
         if self.loss != 0:
@@ -174,6 +181,7 @@ class FeatureMap(object):
         self.index = -1
         self.feature_index_map = {}
         self.features = []
+        self.total_fields = 0
 
     def get_feature_id(self, str_feature):
         try:
@@ -191,10 +199,14 @@ class FeatureMap(object):
                 t.append(self.get_feature_id(feature))
             except Exception as e:
                 pass
+        self.total_fields = max(self.total_fields, len(t))
         return seq.join(t)
 
     def max_feature(self):
         return self.index + 1
+
+    def max_fields(self):
+        return self.total_fields
 
     def save(self, feature_data_filename):
         with open(feature_data_filename, "wb") as f:
@@ -228,6 +240,9 @@ class FeatureStream(object):
 
     def feature_count(self):
         return self.feature_map.max_feature()
+
+    def field_count(self):
+        return self.feature_map.max_fields()
 
     def next(self):
         try:

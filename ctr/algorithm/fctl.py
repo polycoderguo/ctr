@@ -11,12 +11,12 @@ class Fctl(object):
         self.n = [0 for _ in xrange(self.feature_count)]
         self.w = [0 for _ in xrange(self.feature_count)]
 
-    def train(self, feature_stream, alpha, beta, lamba1, lamba2, init=False):
+    def train(self, feature_stream, alpha, beta, lamba1, lamba2, init=False, report_interval=1000000):
         if init:
             self.z = [0 for _ in xrange(self.feature_count)]
             self.n = [0 for _ in xrange(self.feature_count)]
             self.w = [0 for _ in xrange(self.feature_count)]
-        validate_helper = utility.ValidateHelper()
+        validate_helper = utility.ValidateHelper(report_interval=report_interval)
         validate_helper.out_put()
         for count, (click, features) in enumerate(feature_stream):
             t = 0
@@ -36,8 +36,8 @@ class Fctl(object):
             validate_helper.update(p, click, 0.5)
         validate_helper.out_put()
 
-    def test(self, feature_stream, p_threshold=0.5):
-        validate_helper = utility.ValidateHelper()
+    def test(self, feature_stream, p_threshold=0.5, report_interval=1000000):
+        validate_helper = utility.ValidateHelper(report_interval=report_interval)
         for count, (click, features) in enumerate(feature_stream):
             t = 0
             for feature_index in features:
