@@ -94,7 +94,6 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
             if is_train:
                 history[user_id]['buffer'] += row.get('click')
         else:
-            user_id = device_ip + device_model
             user_click_history = ''
         #user_count[user_id] += 1
         #user_hour_count[user_id + '-' + hour] += 1
