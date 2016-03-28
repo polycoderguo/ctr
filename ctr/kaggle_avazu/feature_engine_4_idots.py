@@ -11,13 +11,33 @@ def is_app(row):
 def has_id_info(row):
     return False if row.get("device_id") == 'a99f214a' else True
 
+device_ip_count = defaultdict(int)
+device_id_count = defaultdict(int)
+user_count = defaultdict(int)
+user_hour_count = defaultdict(int)
+
+
+def scan(train_file_name):
+    reader = utility.CSVReader(train_file_name)
+    for count, row in enumerate(reader):
+        device_id = row.get("device_id")
+        device_id_count[device_id] += 1
+        device_ip = row.get("device_ip")
+        device_ip_count[device_ip] += 1
+        device_model = row.get("device_model")
+        if has_id_info(row):
+            user_id = 'id-' + device_id
+        else:
+            user_id = 'ip-' + device_ip + '-' + device_model
+        user_count[user_id] += 1
+        hour = row.get("hour")
+        user_hour_count[user_id + '-' + hour] += 1
+        utility.progress(count)
+    reader.close()
+
 
 def convert_feature(train_file_name, feature_file_name, map_file_name, shared_app_map_file=None, shared_site_map_file=None, is_train = True):
     reader = utility.CSVReader(train_file_name)
-    device_ip_count = defaultdict(int)
-    device_id_count = defaultdict(int)
-    user_count = defaultdict(int)
-    user_hour_count = defaultdict(int)
 
     history = defaultdict(lambda: {'history': '', 'buffer': '', 'prev_hour': ''})
 
@@ -40,21 +60,6 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
 
     ff_app = open(app_feature_file_name, "wb")
     ff_site = open(site_feature_file_name, "wb")
-    for count, row in enumerate(reader):
-        device_id = row.get("device_id")
-        device_id_count[device_id] += 1
-        device_ip = row.get("device_ip")
-        device_ip_count[device_ip] += 1
-        device_model = row.get("device_model")
-        if has_id_info(row):
-            user_id = device_id
-        else:
-            user_id = device_ip + device_model
-        user_count[user_id] += 1
-        hour = row.get("hour")
-        user_hour_count[user_id + '-' + hour] += 1
-    reader.close()
-    reader = utility.CSVReader(train_file_name)
 
     for count, row in enumerate(reader):
         app_row = False
@@ -123,6 +128,9 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
     site_feature_map.save(site_map_file)
 
 if __name__ == "__main__":
+    print "Scan......"
+    scan(utility.get_date_file_path("t.csv"))
+    scan(utility.get_date_file_path("v.csv"))
     print "Train features....."
     convert_feature(utility.get_date_file_path("t.csv"), utility.get_date_file_path("4_id_train_features.csv"), utility.get_date_file_path("4_id_feature_map.json"))
     print "Test features....."
