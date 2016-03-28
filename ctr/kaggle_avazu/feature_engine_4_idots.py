@@ -12,12 +12,14 @@ def has_id_info(row):
     return False if row.get("device_id") == 'a99f214a' else True
 
 
-def convert_feature(train_file_name, feature_file_name, map_file_name, shared_app_map_file=None, shared_site_map_file=None):
+def convert_feature(train_file_name, feature_file_name, map_file_name, shared_app_map_file=None, shared_site_map_file=None, is_train = True):
     reader = utility.CSVReader(train_file_name)
     device_ip_count = defaultdict(int)
     device_id_count = defaultdict(int)
     user_count = defaultdict(int)
     user_hour_count = defaultdict(int)
+
+    history = defaultdict(lambda: {'history': '', 'buffer': '', 'prev_hour': ''})
 
     t = os.path.split(feature_file_name)
     app_feature_file_name = os.path.join(t[0], 'app_' + t[1])
@@ -76,8 +78,17 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
         #device_ip_count[device_ip] += 1
         if has_id_info(row):
             user_id = device_id
+            if is_train:
+                if history[user_id]['prev_hour'] != row.get('hour'):
+                    history[user_id]['history'] = (history[user_id]['history'] + history[user_id]['buffer'])[-4]
+                    history[user_id]['buffer'] = ''
+                    history[user_id]['prev_hour'] = row.get('hour')
+                user_click_history = history[user_id]['history']
+            else:
+                user_click_history = ''
         else:
             user_id = device_ip + device_model
+            user_click_history = ''
         #user_count[user_id] += 1
         #user_hour_count[user_id + '-' + hour] += 1
         smooth_user_count = user_hour_count[user_id + '-' + hour]
@@ -104,7 +115,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
             device_ip_count[device_ip] > 1000 and 'device_ip-' + device_ip or 'device_ip-less-' + str(device_ip_count[device_ip]),
             device_id_count[device_id] > 1000 and 'device_id-' + device_id or 'device_id-less-' + str(device_id_count[device_id]),
             smooth_user_count > 30 and 'smooth_user_hour_count-0' or 'smooth_user_hour_count-' + str(smooth_user_count),
-            'user_count-' + str(user_count[user_id])
+            user_count[user_id] > 30 and 'user_count-' + str(user_count[user_id]) or 'user_count-' + str(user_count[user_id]) + '-' + user_click_history
         ], seq=' ') + "\r\n")
         utility.progress(count)
     ff_app.close()
@@ -117,4 +128,5 @@ if __name__ == "__main__":
     convert_feature(utility.get_date_file_path("t.csv"), utility.get_date_file_path("4_id_train_features.csv"), utility.get_date_file_path("4_id_feature_map.json"))
     print "Test features....."
     convert_feature(utility.get_date_file_path("v.csv"), utility.get_date_file_path("4_id_test_features.csv"),
-                    utility.get_date_file_path("4_id_feature_map.json"), shared_app_map_file=utility.get_date_file_path("app_4_id_feature_map.json"), shared_site_map_file=utility.get_date_file_path("site_4_id_feature_map.json"))
+                    utility.get_date_file_path("4_id_feature_map.json"), shared_app_map_file=utility.get_date_file_path("app_4_id_feature_map.json"),
+                    shared_site_map_file=utility.get_date_file_path("site_4_id_feature_map.json"), is_train=False)
