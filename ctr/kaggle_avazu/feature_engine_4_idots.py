@@ -15,7 +15,7 @@ device_ip_count = defaultdict(int)
 device_id_count = defaultdict(int)
 user_count = defaultdict(int)
 user_hour_count = defaultdict(int)
-
+history = defaultdict(lambda: {'history': '', 'buffer': '', 'prev_hour': ''})
 
 def scan(train_file_name):
     reader = utility.CSVReader(train_file_name)
@@ -38,8 +38,6 @@ def scan(train_file_name):
 
 def convert_feature(train_file_name, feature_file_name, map_file_name, shared_app_map_file=None, shared_site_map_file=None, is_train = True):
     reader = utility.CSVReader(train_file_name)
-
-    history = defaultdict(lambda: {'history': '', 'buffer': '', 'prev_hour': ''})
 
     t = os.path.split(feature_file_name)
     app_feature_file_name = os.path.join(t[0], 'app_' + t[1])
