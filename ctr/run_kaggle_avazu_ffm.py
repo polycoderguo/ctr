@@ -13,7 +13,7 @@ if __name__ == "__main__":
     else:
         eta, _lambda, k, iter = 0.03, 0.00002, 4, 15
     train_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(train_data_file))
-    model_file = "app_model_ffm_{0}_{1}.json".format(eta, _lambda)
+    model_file = "app_model_ffm_v3_{0}_{1}.json".format(eta, _lambda)
     print "training......"
     alg = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     pre_logloss = 0
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         train_fs.reset()
         print "iter {0}......".format(i)
         #alg.load_model(utility.get_date_file_path(model_file))
-        log_loss = alg.train(train_fs, _lambda, eta, report_interval=1000000)
+        log_loss = alg.train(train_fs, _lambda, eta, report_interval=-1)
         alg.dump_model(utility.get_date_file_path(model_file))
         print "testing......"
         test_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(test_data_file))

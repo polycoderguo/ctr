@@ -34,31 +34,31 @@ class FFM(object):
                         self.W[self.W_index(j, f, d)] = coef * random.random()
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
         validate_helper.out_put()
+        align_0 = self.k
+        align_1 = self.total_fields * align_0
         for count, (click, features) in enumerate(feature_stream):
             y = click > 0 and 1.0 or -1.0
             t = 0.0
             field_count = len(features)
             for f_index_1 in xrange(field_count):
                 j1 = features[f_index_1]
-                j1_align = j1 * self.total_fields * self.k + f_index_1 * self.k
                 for f_index_2 in xrange(f_index_1 + 1, field_count):
                     j2 = features[f_index_2]
-                    j2_align = j2 * self.total_fields * self.k + f_index_2 * self.k
+                    j1_align = j1 * align_1 + f_index_2 * align_0
+                    j2_align = j2 * align_1 + f_index_1 * align_0
                     for d in xrange(self.k):
                         #t += (self.W[self.W_index(j1, f_index_1, d)] * self.W[self.W_index(j2, f_index_2, d)] * self.v)
                         t += (self.W[j1_align + d] * self.W[j2_align + d] * self.v)
             p = utility.sigmoid(t)
             expnyt = math.exp(-y*t)
-            kappav = -y*expnyt/(1+expnyt)
+            kappav = (-y*expnyt/(1+expnyt)) * self.v
             for f_index_1 in xrange(field_count):
                 j1 = features[f_index_1]
-                j1_align = j1 * self.total_fields * self.k + f_index_1 * self.k
                 for f_index_2 in xrange(f_index_1 + 1, field_count):
                     j2 = features[f_index_2]
-                    j2_align = j2 * self.total_fields * self.k + f_index_2 * self.k
+                    j1_align = j1 * align_1 + f_index_2 * align_0
+                    j2_align = j2 * align_1 + f_index_1 * align_0
                     for d in xrange(self.k):
-                        #w1_index = self.W_index(j1, f_index_1, d)
-                        #w2_index = self.W_index(j2, f_index_2, d)
                         w1_index = j1_align + d
                         w2_index = j2_align + d
                         g1 = _lambda * self.W[w1_index] + kappav * self.W[w2_index]
@@ -73,15 +73,17 @@ class FFM(object):
 
     def test(self, feature_stream, p_threshold=0.5,report_interval=1000000):
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
+        align_0 = self.k
+        align_1 = self.total_fields * align_0
         for count, (click, features) in enumerate(feature_stream):
             t = 0.0
             field_count = len(features)
             for f_index_1 in xrange(field_count):
                 j1 = features[f_index_1]
-                j1_align = j1 * self.total_fields * self.k + f_index_1 * self.k
                 for f_index_2 in xrange(f_index_1 + 1, field_count):
                     j2 = features[f_index_2]
-                    j2_align = j2 * self.total_fields * self.k + f_index_2 * self.k
+                    j1_align = j1 * align_1 + f_index_2 * align_0
+                    j2_align = j2 * align_1 + f_index_1 * align_0
                     for d in xrange(self.k):
                         #t += (self.W[self.W_index(j1, f_index_1, d)] * self.W[self.W_index(j2, f_index_2, d)] * self.v)
                         t += (self.W[j1_align + d] * self.W[j2_align + d] * self.v)
