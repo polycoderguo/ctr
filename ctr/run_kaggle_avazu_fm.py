@@ -4,16 +4,16 @@ from ctr.common import utility
 import sys
 
 if __name__ == "__main__":
-    feature_map_file = "app_feature_map.json"
-    train_data_file = "app_train_features.csv"
-    test_data_file = "app_test_features.csv"
+    feature_map_file = "feature_map_v3.json"
+    train_data_file = "app_train_features_v3.csv"
+    test_data_file = "app_test_features_v3.csv"
     if len(sys.argv) > 2:
         eta, _lambda, k, iter = sys.argv[1:]
         eta, _lambda, k, iter = float(eta), float(_lambda), int(k), int(iter)
     else:
         eta, _lambda, k, iter = 0.03, 0.00002, 4, 15
     train_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(train_data_file))
-    model_file = "app_model_fm_{0}_{1}.json".format(eta, _lambda)
+    model_file = "app_model_fm_{0}_{1}_v3.json".format(eta, _lambda)
     print "training......"
     alg = fm.FM(train_fs.feature_count(), k)
     pre_logloss = 0
