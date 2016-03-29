@@ -60,9 +60,9 @@ class ValidateHelper(object):
         if clicked:
             self.loss += math.log(p)
         else:
-                self.loss += math.log(1-p)
+            self.loss += math.log(1-p)
         avg = self.clicked / float(self.total)
-        if avg > 0:
+        if 0 < avg < 1.0:
             self.avg_loss += clicked * math.log(avg) + (1 - clicked) * math.log(1 - avg)
         if self.report_interval >0 and self.total % self.report_interval == 0:
             self.out_put()

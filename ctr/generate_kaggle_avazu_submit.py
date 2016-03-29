@@ -20,29 +20,29 @@ if __name__ == "__main__":
     scan(train_data_file)
     scan(test_data_file)
     print "Train features....."
-    convert_feature(train_data_file, train_feature_file, feature_map_file, submit=True)
+    convert_feature(train_data_file, train_feature_file, feature_map_file)
     print "Test features....."
     convert_feature(test_data_file, test_feature_file, feature_map_file, shared_map_file=feature_map_file, is_train=False, submit=True)
 
     eta, _lambda, k, iter = 0.03, 0.0002, 4, 13
-    train_fs = utility.FeatureStream(feature_map_file, app_train_feature_file, click_at=2)
+    train_fs = utility.FeatureStream(feature_map_file, app_train_feature_file)
     alg = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     print "Start learning app......"
     for i in xrange(iter):
         train_fs.reset()
         print "iter {0}......".format(i)
         alg.train(train_fs, _lambda, eta, report_interval=-1)
-        alg.dump_model(utility.get_date_file_path(app_model_file))
+        alg.dump_model(app_model_file)
 
     eta, _lambda, k, iter = 0.03, 0.0002, 4, 17
-    train_fs = utility.FeatureStream(feature_map_file, site_train_feature_file, click_at=2)
+    train_fs = utility.FeatureStream(feature_map_file, site_train_feature_file)
     alg = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     print "Start learning site......"
     for i in xrange(iter):
         train_fs.reset()
         print "iter {0}......".format(i)
         alg.train(train_fs, _lambda, eta, report_interval=-1)
-        alg.dump_model(utility.get_date_file_path(site_model_file))
+        alg.dump_model(site_model_file)
 
     print "Start predict......"
     test_fs = utility.FeatureStream(feature_map_file, train_data_file, click_at=1)
