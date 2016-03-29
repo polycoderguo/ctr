@@ -25,7 +25,7 @@ class FM(object):
             self.V = [coef * random.random() for _ in xrange(self.total_features * self.k)]
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
         validate_helper.out_put()
-        for count, (click, features) in enumerate(feature_stream):
+        for count, (_, click, features) in enumerate(feature_stream):
             y = click > 0 and 1.0 or -1.0
             t = self.w_0
             field_count = len(features)
@@ -58,7 +58,7 @@ class FM(object):
 
     def test(self, feature_stream, p_threshold=0.5,report_interval=1000000):
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
-        for count, (click, features) in enumerate(feature_stream):
+        for count, (_, click, features) in enumerate(feature_stream):
             t = self.w_0
             field_count = len(features)
             sum_v_f = [0 for _ in xrange(self.k)]

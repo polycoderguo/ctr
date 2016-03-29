@@ -18,7 +18,7 @@ class Fctl(object):
             self.w = [0 for _ in xrange(self.feature_count)]
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
         validate_helper.out_put()
-        for count, (click, features) in enumerate(feature_stream):
+        for count, (_, click, features) in enumerate(feature_stream):
             t = 0
             for feature_index in features:
                 if abs(self.z[feature_index]) > lamba1:
@@ -38,7 +38,7 @@ class Fctl(object):
 
     def test(self, feature_stream, p_threshold=0.5, report_interval=1000000):
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
-        for count, (click, features) in enumerate(feature_stream):
+        for count, (_, click, features) in enumerate(feature_stream):
             t = 0
             for feature_index in features:
                 t += self.w[feature_index]

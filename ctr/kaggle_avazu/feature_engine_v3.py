@@ -41,7 +41,7 @@ def scan(train_file_name):
     reader.close()
 
 
-def convert_feature(train_file_name, feature_file_name, map_file_name, shared_map_file=None, is_train=True):
+def convert_feature(train_file_name, feature_file_name, map_file_name, shared_map_file=None, is_train=True, submit=False):
     reader = utility.CSVReader(train_file_name)
 
     t = os.path.split(feature_file_name)
@@ -94,7 +94,12 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
             ff = ff_app
         else:
             ff = ff_site
+        if submit:
+            append_info = "{0},{1},".format(row.get("id"), app_row and 1 or 0)
+        else:
+            append_info = ""
         ff.write(
+            append_info +
             row.get("click") + "," + feature_map.map_features([
             'pub_id-' + pub_id,
             'pub_domain-' + pub_domain,

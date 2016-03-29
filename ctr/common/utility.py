@@ -225,10 +225,11 @@ class FeatureMap(object):
 
 
 class FeatureStream(object):
-    def __init__(self, feature_map_filename, feature_data_filename, seq=","):
+    def __init__(self, feature_map_filename, feature_data_filename, seq=",", click_at=0):
         self.feature_map_filename = feature_map_filename
         self.feature_data_filename = feature_data_filename
         self.seq = seq
+        self.click_at = click_at
         self.reset()
 
     def reset(self):
@@ -249,7 +250,7 @@ class FeatureStream(object):
             t = self.f.readline().strip()
             assert len(t) > 0
             t = t.split(self.seq)
-            return int(t[0]), [int(x) for x in t[1:]]
+            return t[:self.click_at], int(t[self.click_at]), [int(x) for x in t[self.click_at + 1:]]
         except:
             raise StopIteration()
 
