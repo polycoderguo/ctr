@@ -95,12 +95,11 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
         else:
             ff = ff_site
         if submit:
-            append_info = "{0},{1},".format(row.get("id"), app_row and 1 or 0)
+            append_info = "{0},{1}".format(row.get("id"), app_row and 1 or 0)
         else:
-            append_info = ""
+            append_info = row.get("click")
         ff.write(
-            append_info +
-            row.get("click") + "," + feature_map.map_features([
+            append_info + "," + feature_map.map_features([
             'pub_id-' + pub_id,
             'pub_domain-' + pub_domain,
             'pub_category-' + pub_category,

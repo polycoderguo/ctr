@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-from ctr.common import utility
 from ctr.algorithm import ffm
 from ctr.kaggle_avazu.feature_engine_v3 import *
 
@@ -25,7 +24,7 @@ if __name__ == "__main__":
     print "Test features....."
     convert_feature(test_data_file, test_feature_file, feature_map_file, shared_map_file=feature_map_file, is_train=False, submit=True)
 
-    eta, _lambda, k, iter = 0.03, 0.0005, 4, 13
+    eta, _lambda, k, iter = 0.03, 0.0002, 4, 13
     train_fs = utility.FeatureStream(feature_map_file, app_train_feature_file, click_at=2)
     alg = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     print "Start learning app......"
@@ -35,7 +34,7 @@ if __name__ == "__main__":
         alg.train(train_fs, _lambda, eta, report_interval=-1)
         alg.dump_model(utility.get_date_file_path(app_model_file))
 
-    eta, _lambda, k, iter = 0.03, 0.0005, 4, 17
+    eta, _lambda, k, iter = 0.03, 0.0002, 4, 17
     train_fs = utility.FeatureStream(feature_map_file, site_train_feature_file, click_at=2)
     alg = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     print "Start learning site......"
@@ -46,14 +45,13 @@ if __name__ == "__main__":
         alg.dump_model(utility.get_date_file_path(site_model_file))
 
     print "Start predict......"
-    test_fs = utility.FeatureStream(feature_map_file, train_data_file, click_at=2)
+    test_fs = utility.FeatureStream(feature_map_file, train_data_file, click_at=1)
     alg_app = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     alg_app.load_model(app_model_file)
     alg_site = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     alg_site.load_model(site_model_file)
     with open(submit_file_name, "wb") as f:
-        for count, (append_info, click, features) in enumerate(test_fs):
-            id, app_row = append_info
+        for count, ((id,), app_row, features) in enumerate(test_fs):
             if app_row == "1":
                 p = alg_app.predict(features)
             else:
