@@ -55,6 +55,8 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
 
     ff_app = open(app_feature_file_name, "wb")
     ff_site = open(site_feature_file_name, "wb")
+    if submit:
+        ff_submit = open(feature_map, "wb")
 
     for count, row in enumerate(reader):
         app_row = False
@@ -96,6 +98,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
             ff = ff_site
         if submit:
             append_info = "{0},{1}".format(row.get("id"), app_row and 1 or 0)
+            ff = ff_submit
         else:
             append_info = row.get("click")
         ff.write(
@@ -119,6 +122,8 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
         utility.progress(count)
     ff_app.close()
     ff_site.close()
+    if submit:
+        ff_submit.close()
     feature_map.save(map_file_name)
 
 if __name__ == "__main__":
