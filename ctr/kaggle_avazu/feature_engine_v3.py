@@ -56,7 +56,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
     ff_app = open(app_feature_file_name, "wb")
     ff_site = open(site_feature_file_name, "wb")
     if submit:
-        ff_submit = open(feature_map, "wb")
+        ff_submit = open(feature_file_name, "wb")
 
     for count, row in enumerate(reader):
         app_row = False
