@@ -51,10 +51,11 @@ if __name__ == "__main__":
     alg_site = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     alg_site.load_model(site_model_file)
     with open(submit_file_name, "wb") as f:
+        f.write("id,click")
         for count, ((id,), app_row, features) in enumerate(test_fs):
             if app_row == "1":
                 p = alg_app.predict(features)
             else:
                 p = alg_site.predict(features)
-            f.write("%s,%.10f\r\n".format(id, p))
+            f.write("\r\n,%s,%.10f" % (id, p))
             utility.progress(count)
