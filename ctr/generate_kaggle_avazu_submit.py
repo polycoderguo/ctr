@@ -50,7 +50,7 @@ if __name__ == "__main__":
     alg_app.load_model(app_model_file)
     alg_site = ffm.FFM(train_fs.feature_count(), train_fs.field_count(), k)
     alg_site.load_model(site_model_file)
-    with open(submit_file_name, "wb") as f:
+    with open(submit_file_name, "rb") as f:
         for count, ((id,), app_row, features) in enumerate(test_fs):
             if app_row == "1":
                 p = alg_app.predict(features)
