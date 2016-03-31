@@ -281,7 +281,7 @@ class FeatureStream(object):
         self.reset()
 
     def reset(self):
-        self.feature_map = FeatureMap.load(self.feature_map_filename)
+        self.feature_map = HashFeatureMap.load(self.feature_map_filename)
         self.f = open(self.feature_data_filename, "rb")
 
     def __iter__(self):
