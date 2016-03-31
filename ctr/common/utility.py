@@ -264,7 +264,7 @@ class HashFeatureMap(object):
     def load(feature_data_filename):
         with open(feature_data_filename, "rb") as f:
             t = json.load(f)
-            feature_map = FeatureMap()
+            feature_map = HashFeatureMap()
             feature_map.__dict__ = t
             return feature_map
 
