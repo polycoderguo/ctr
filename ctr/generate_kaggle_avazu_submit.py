@@ -8,8 +8,8 @@ if __name__ == "__main__":
     app_train_feature_file = utility.get_date_file_path("app_train_features_v3_submit.csv")
     site_train_feature_file = utility.get_date_file_path("site_train_features_v3_submit.csv")
     test_feature_file = utility.get_date_file_path("test_features_v3_submit.csv")
-    app_model_file = utility.get_date_file_path("app_model_v3_submit")
-    site_model_file = utility.get_date_file_path("site_model_v3_submit")
+    app_model_file = utility.get_date_file_path("app_model_v3_submit.csv")
+    site_model_file = utility.get_date_file_path("site_model_v3_submit.csv")
 
     train_data_file = utility.get_date_file_path("train.csv")
     test_data_file = utility.get_date_file_path("test.csv")
