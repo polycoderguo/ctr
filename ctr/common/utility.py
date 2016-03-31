@@ -233,6 +233,7 @@ def hashstr(input):
 class HashFeatureMap(object):
     def __init__(self):
         self.feature_index_map = {}
+        self.total_fields = 0
 
     def get_feature_id(self, str_feature):
         feature = hashstr(str_feature)
