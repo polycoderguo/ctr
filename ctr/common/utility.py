@@ -5,6 +5,7 @@ import os
 from collections import defaultdict
 import time
 import math
+import hashlib
 
 
 def wise_mk_dir(path):
@@ -221,6 +222,53 @@ class FeatureMap(object):
 
     def feature_index_2_str(self, feature_index):
         return self.features[feature_index]
+
+NR_BINS = 1000000
+
+
+def hashstr(input):
+    return str(int(hashlib.md5(input.encode('utf8')).hexdigest(), 16) % (NR_BINS-1)+1)
+
+
+class HashFeatureMap(object):
+    def __init__(self):
+        self.feature_index_map = {}
+
+    def get_feature_id(self, str_feature):
+        feature = hashstr(str_feature)
+        self.feature_index_map[feature] = str_feature
+        return feature
+
+    def map_features(self, features, seq=","):
+        t = []
+        for feature in features:
+            try:
+                t.append(self.get_feature_id(feature))
+            except Exception as e:
+                pass
+        self.total_fields = max(self.total_fields, len(t))
+        return seq.join(t)
+
+    def max_feature(self):
+        return NR_BINS + 1
+
+    def max_fields(self):
+        return self.total_fields
+
+    def save(self, feature_data_filename):
+        with open(feature_data_filename, "wb") as f:
+            json.dump(self.__dict__, f)
+
+    @staticmethod
+    def load(feature_data_filename):
+        with open(feature_data_filename, "rb") as f:
+            t = json.load(f)
+            feature_map = FeatureMap()
+            feature_map.__dict__ = t
+            return feature_map
+
+    def feature_index_2_str(self, feature_index):
+        return self.feature_index_map[feature_index]
 
 
 class FeatureStream(object):
