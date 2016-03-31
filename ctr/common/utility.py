@@ -57,14 +57,16 @@ class ValidateHelper(object):
             else:
                 self.predict_un_clicked_correct += 1
         #self.loss += clicked * np.log(p) + (1 - clicked) * np.log(1 - p)
+        epsilon = 1e-15
+        p = min(1-epsilon, max(epsilon, p))
         if clicked:
             self.loss += math.log(p)
         else:
             self.loss += math.log(1-p)
         avg = self.clicked / float(self.total)
-        if 0 < avg < 1.0:
-            self.avg_loss += clicked * math.log(avg) + (1 - clicked) * math.log(1 - avg)
-        if self.report_interval >0 and self.total % self.report_interval == 0:
+        avg = min(1-epsilon, max(epsilon, avg))
+        self.avg_loss += clicked * math.log(avg) + (1 - clicked) * math.log(1 - avg)
+        if self.report_interval > 0 and self.total % self.report_interval == 0:
             self.out_put()
 
     def get_log_loss(self):
@@ -75,10 +77,7 @@ class ValidateHelper(object):
         return logloss
 
     def out_put(self):
-        if self.loss != 0:
-            logloss = (-1.0 / float(self.total)) * self.loss
-        else:
-            logloss = 0
+        logloss = self.get_log_loss()
         if self.avg_loss != 0:
             avg_logloss = (-1.0 / float(self.total)) * self.avg_loss
         else:
