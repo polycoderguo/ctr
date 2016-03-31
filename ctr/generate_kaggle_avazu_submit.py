@@ -57,5 +57,5 @@ if __name__ == "__main__":
                 p = alg_app.predict(features)
             else:
                 p = alg_site.predict(features)
-            f.write("\r\n,%s,%.10f" % (id, p))
+            f.write("\n%s,%.10f" % (id, p))
             utility.progress(count)
