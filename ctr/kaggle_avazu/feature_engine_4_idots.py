@@ -115,7 +115,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
             device_ip_count[device_ip] > 1000 and 'device_ip-' + device_ip or 'device_ip-less-' + str(device_ip_count[device_ip]),
             device_id_count[device_id] > 1000 and 'device_id-' + device_id or 'device_id-less-' + str(device_id_count[device_id]),
             smooth_user_count > 30 and 'smooth_user_hour_count-0' or 'smooth_user_hour_count-' + str(smooth_user_count),
-            user_count[user_id] > 30 and 'user_click_history-' + str(user_count[user_id]) or 'user_click_history-' + str(user_count[user_id]) + '-' + user_click_history
+            user_count[user_id] > 30 and 'user_click_histroy-' + str(user_count[user_id]) or 'user_click_histroy-' + str(user_count[user_id]) + '-' + user_click_history
         ], seq=' ') + "\r\n")
         utility.progress(count)
     ff_app.close()
