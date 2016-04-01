@@ -234,10 +234,12 @@ class HashFeatureMap(object):
     def __init__(self):
         self.feature_index_map = {}
         self.total_fields = 0
+        self.max_feature = 0
 
     def get_feature_id(self, str_feature):
         feature = hashstr(str_feature)
         self.feature_index_map[feature] = str_feature
+        self.max_feature = max(self.max_feature, feature)
         return feature
 
     def map_features(self, features, seq=","):
@@ -251,7 +253,7 @@ class HashFeatureMap(object):
         return seq.join(t)
 
     def max_feature(self):
-        return NR_BINS + 1
+        return self.max_feature + 1
 
     def max_fields(self):
         return self.total_fields
