@@ -253,7 +253,7 @@ class HashFeatureMap(object):
         return seq.join(t)
 
     def max_feature(self):
-        return self._max_feature + 1
+        return int(self._max_feature) + 1
 
     def max_fields(self):
         return self.total_fields
