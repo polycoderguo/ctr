@@ -10,7 +10,7 @@ class FFM(object):
         self.total_features = total_features
         self.total_fields = total_fields
         self.k = k
-        self.v = 2.0 / float(self.k)
+        self.v = 2.0 / float(self.total_fields)
         self.W = [0.0 for _ in xrange(self.total_features * self.total_fields * self.k)]
         self.W2 = [1.0 for _ in xrange(self.total_features * self.total_fields * self.k)]
         coef = 0.5 / math.sqrt(self.k)
