@@ -49,9 +49,9 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
     site_feature_file_name = os.path.join(t[0], 'site_' + t[1])
 
     if shared_map_file:
-        feature_map = utility.FeatureMap.load(shared_map_file)
+        feature_map = utility.HashFeatureMap.load(shared_map_file)
     else:
-        feature_map = utility.FeatureMap()
+        feature_map = utility.HashFeatureMap()
 
     ff_app = open(app_feature_file_name, "wb")
     ff_site = open(site_feature_file_name, "wb")

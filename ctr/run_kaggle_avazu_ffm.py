@@ -22,7 +22,7 @@ if __name__ == "__main__":
         print "iter {0}......".format(i)
         #alg.load_model(utility.get_date_file_path(model_file))
         log_loss = alg.train(train_fs, _lambda, eta, report_interval=-1)
-        alg.dump_model(utility.get_date_file_path(model_file))
+        #alg.dump_model(utility.get_date_file_path(model_file))
         print "testing......"
         test_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(test_data_file))
         alg.test(test_fs, report_interval=-1)
