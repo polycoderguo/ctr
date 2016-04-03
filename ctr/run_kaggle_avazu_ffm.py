@@ -8,7 +8,7 @@ if __name__ == "__main__":
     train_data_file = "app_train_features_v3.csv"
     test_data_file = "app_test_features_v3.csv"
     if len(sys.argv) > 1:
-        eta, _lambda, k, iter = sys.argv[1:]
+        eta, _lambda, k, iter = sys.argv[1:5]
         eta, _lambda, k, iter = float(eta), float(_lambda), int(k), int(iter)
     else:
         eta, _lambda, k, iter = 0.03, 0.00002, 4, 15
