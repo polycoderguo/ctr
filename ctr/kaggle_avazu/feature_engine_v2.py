@@ -28,13 +28,13 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ap
     site_map_file = os.path.join(t[0], 'site_' + t[1])
 
     if shared_app_map_file:
-        app_feature_map = utility.FeatureMap.load(shared_app_map_file)
+        app_feature_map = utility.DummyFeatureMap.load(shared_app_map_file)
     else:
-        app_feature_map = utility.FeatureMap()
+        app_feature_map = utility.DummyFeatureMap()
     if shared_site_map_file:
-        site_feature_map = utility.FeatureMap.load(shared_site_map_file)
+        site_feature_map = utility.DummyFeatureMap.load(shared_site_map_file)
     else:
-        site_feature_map = utility.FeatureMap()
+        site_feature_map = utility.DummyFeatureMap()
 
     ff_app = open(app_feature_file_name, "wb")
     ff_site = open(site_feature_file_name, "wb")

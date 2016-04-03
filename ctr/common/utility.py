@@ -176,7 +176,7 @@ class CSVReader(object):
         self.f.close()
 
 
-class FeatureMap(object):
+class DummyFeatureMap(object):
     def __init__(self):
         self.index = -1
         self.feature_index_map = {}
@@ -188,7 +188,7 @@ class FeatureMap(object):
             return self.feature_index_map[str_feature]
         except:
             self.index += 1
-            self.feature_index_map[str_feature]=str(self.index)
+            self.feature_index_map[str_feature] = str(self.index)
             self.features.append(str_feature)
             return self.feature_index_map[str_feature]
 
@@ -216,7 +216,7 @@ class FeatureMap(object):
     def load(feature_data_filename):
         with open(feature_data_filename, "rb") as f:
             t = json.load(f)
-            feature_map = FeatureMap()
+            feature_map = DummyFeatureMap()
             feature_map.__dict__ = t
             return feature_map
 
@@ -227,28 +227,23 @@ NR_BINS = 1000000
 
 
 def hashstr(input):
-    return str(int(hashlib.md5(input.encode('utf8')).hexdigest(), 16) % (NR_BINS-1)+1)
+    return str(int(hashlib.md5(input.encode('utf8')).hexdigest(), 16) % NR_BINS)
 
 
 class HashFeatureMap(object):
     def __init__(self):
-        self.feature_index_map = {}
         self.total_fields = 0
         self._max_feature = 0
 
     def get_feature_id(self, str_feature):
         feature = hashstr(str_feature)
-        self.feature_index_map[feature] = str_feature
-        self._max_feature = max(self._max_feature, feature)
+        self._max_feature = max(int(self._max_feature), feature)
         return feature
 
     def map_features(self, features, seq=","):
         t = []
         for feature in features:
-            try:
-                t.append(self.get_feature_id(feature))
-            except Exception as e:
-                pass
+            t.append(self.get_feature_id(feature))
         self.total_fields = max(self.total_fields, len(t))
         return seq.join(t)
 
@@ -270,20 +265,16 @@ class HashFeatureMap(object):
             feature_map.__dict__ = t
             return feature_map
 
-    def feature_index_2_str(self, feature_index):
-        return self.feature_index_map[feature_index]
-
 
 class FeatureStream(object):
-    def __init__(self, feature_map_filename, feature_data_filename, seq=",", click_at=0):
-        self.feature_map_filename = feature_map_filename
+    def __init__(self, feature_map, feature_data_filename, seq=",", click_at=0):
         self.feature_data_filename = feature_data_filename
         self.seq = seq
         self.click_at = click_at
+        self.feature_map = feature_map
         self.reset()
 
     def reset(self):
-        self.feature_map = HashFeatureMap.load(self.feature_map_filename)
         self.f = open(self.feature_data_filename, "rb")
 
     def __iter__(self):
@@ -360,6 +351,7 @@ class Timer(object):
 
     def total_cost_time(self):
         return self.total_time
+
 
 def sigmoid(x):
   return 1.0 / (1.0 + math.exp(-x))

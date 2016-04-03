@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from ctr.common import utility
 from collections import defaultdict
+import sys
 import os
 
 
@@ -41,7 +42,7 @@ def scan(train_file_name):
     reader.close()
 
 
-def convert_feature(train_file_name, feature_file_name, map_file_name, shared_map_file=None, is_train=True, submit=False):
+def convert_feature(train_file_name, feature_file_name, map_file_name, shared_map_file=None, is_train=True, submit=False, use_hash_map = True):
     reader = utility.CSVReader(train_file_name)
 
     t = os.path.split(feature_file_name)
@@ -49,9 +50,15 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
     site_feature_file_name = os.path.join(t[0], 'site_' + t[1])
 
     if shared_map_file:
-        feature_map = utility.HashFeatureMap.load(shared_map_file)
+        if use_hash_map:
+            feature_map = utility.HashFeatureMap.load(shared_map_file)
+        else:
+            feature_map = utility.DummyFeatureMap(shared_map_file)
     else:
-        feature_map = utility.HashFeatureMap()
+        if use_hash_map:
+            feature_map = utility.HashFeatureMap()
+        else:
+            feature_map = utility.DummyFeatureMap()
 
     ff_app = open(app_feature_file_name, "wb")
     ff_site = open(site_feature_file_name, "wb")
@@ -127,12 +134,21 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
     feature_map.save(map_file_name)
 
 if __name__ == "__main__":
+    train_file = utility.get_date_file_path("train_features_v3.csv")
+    test_file = utility.get_date_file_path("feature_map_v3.json")
+    map_file = utility.get_date_file_path("feature_map_v3.json")
+    if len(sys.argv) > 1 and sys.argv == "dummy":
+        use_hash_map = False
+        print "Use dummy features"
+        train_file = utility.get_date_file_path("train_features_v3_dummy.csv")
+        test_file = utility.get_date_file_path("feature_map_v3_dummy.json")
+        map_file = utility.get_date_file_path("feature_map_v3_dummy.json")
+    else:
+        use_hash_map = True
     print "Scan......"
     scan(utility.get_date_file_path("t.csv"))
     scan(utility.get_date_file_path("v.csv"))
     print "Train features....."
-    convert_feature(utility.get_date_file_path("t.csv"), utility.get_date_file_path("train_features_v3.csv"), utility.get_date_file_path("feature_map_v3.json"))
+    convert_feature(utility.get_date_file_path("t.csv"), train_file, map_file, use_hash_map=use_hash_map)
     print "Test features....."
-    convert_feature(utility.get_date_file_path("v.csv"), utility.get_date_file_path("test_features_v3.csv"),
-                    utility.get_date_file_path("feature_map_v3.json"),
-                    shared_map_file=utility.get_date_file_path("feature_map_v3.json"), is_train=False)
+    convert_feature(utility.get_date_file_path("v.csv"), test_file, map_file, shared_map_file=map_file, is_train=False, use_hash_map=use_hash_map)

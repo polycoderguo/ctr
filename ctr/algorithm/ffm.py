@@ -47,7 +47,6 @@ class FFM(object):
                     j1_align = j1 * align_1 + f_index_2 * align_0
                     j2_align = j2 * align_1 + f_index_1 * align_0
                     for d in xrange(self.k):
-                        #t += (self.W[self.W_index(j1, f_index_1, d)] * self.W[self.W_index(j2, f_index_2, d)] * self.v)
                         t += (self.W[j1_align + d] * self.W[j2_align + d] * self.v)
             p = utility.sigmoid(t)
             expnyt = math.exp(-y*t)
