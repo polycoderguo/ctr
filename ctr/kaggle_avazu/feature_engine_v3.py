@@ -53,7 +53,7 @@ def convert_feature(train_file_name, feature_file_name, map_file_name, shared_ma
         if use_hash_map:
             feature_map = utility.HashFeatureMap.load(shared_map_file)
         else:
-            feature_map = utility.DummyFeatureMap(shared_map_file)
+            feature_map = utility.DummyFeatureMap.load(shared_map_file)
     else:
         if use_hash_map:
             feature_map = utility.HashFeatureMap()
