@@ -137,7 +137,7 @@ if __name__ == "__main__":
     train_file = utility.get_date_file_path("train_features_v3.csv")
     test_file = utility.get_date_file_path("feature_map_v3.json")
     map_file = utility.get_date_file_path("feature_map_v3.json")
-    if len(sys.argv) > 1 and sys.argv == "dummy":
+    if len(sys.argv) > 1 and sys.argv[1] == "dummy":
         use_hash_map = False
         print "Use dummy features"
         train_file = utility.get_date_file_path("train_features_v3_dummy.csv")
