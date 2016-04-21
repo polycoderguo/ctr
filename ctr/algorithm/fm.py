@@ -56,7 +56,7 @@ class FM(object):
         validate_helper.out_put()
         return validate_helper.get_log_loss()
 
-    def test(self, feature_stream, p_threshold=0.5,report_interval=1000000):
+    def test(self, feature_stream, p_threshold=0.5, report_interval=1000000):
         validate_helper = utility.ValidateHelper(report_interval=report_interval)
         for count, (_, click, features) in enumerate(feature_stream):
             t = self.w_0
