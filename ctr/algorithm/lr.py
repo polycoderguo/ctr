@@ -12,14 +12,14 @@ class LR(object):
     def train(self, feature_stream, _lambda, eta, init=False, report_interval=1000000):
         if init:
             self.W = np.zeros(self.total_features + 1)
+        validate_helper = utility.ValidateHelper(report_interval=report_interval)
+        validate_helper.out_put()
         for count, (_, click, features) in enumerate(feature_stream):
             t = self.W[0]
             for feature_index in features:
                 t += self.W[feature_index]
             p = utility.sigmoid(t)
             g = eta * (p - click)
-            validate_helper = utility.ValidateHelper(report_interval=report_interval)
-            validate_helper.out_put()
             self.W[0] -= g
             for feature_index in features:
                 self.W[feature_index] -= (g + _lambda * self.W[feature_index])

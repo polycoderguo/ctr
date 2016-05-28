@@ -11,8 +11,9 @@ if __name__ == "__main__":
         eta, _lambda, iter = sys.argv[1:]
         eta, _lambda, iter = float(eta), int(iter)
     else:
-        eta, _lambda, iter = 0.01, 0, 20
-    train_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(train_data_file))
+        eta, _lambda, iter = 0.003, 0, 20
+    feature_map = utility.DummyFeatureMap.load(utility.get_date_file_path(feature_map_file))
+    train_fs = utility.FeatureStream(feature_map, utility.get_date_file_path(train_data_file))
     print "training......"
     alg = lr.LR(train_fs.feature_count())
     #alg.load_model(utility.get_date_file_path("app_model_1.txt"))
@@ -20,7 +21,7 @@ if __name__ == "__main__":
         train_fs.reset()
         model_file = "app_model_lr_v3_{0}_{1}.json".format(eta, iter)
         print "iter {0}......".format(i)
-        alg.train(train_fs, _lambda, eta, report_interval=-1)
+        alg.train(train_fs, _lambda, eta, report_interval=1000000)
         alg.dump_model(utility.get_date_file_path(model_file))
         print "testing......"
         test_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(test_data_file))
