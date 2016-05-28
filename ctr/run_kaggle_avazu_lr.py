@@ -9,9 +9,9 @@ if __name__ == "__main__":
     test_data_file = "app_test_features.csv"
     if len(sys.argv) > 2:
         eta, _lambda, iter = sys.argv[1:]
-        eta, _lambda, iter = float(eta), int(iter)
+        eta, _lambda, iter = float(eta), float(_lambda), int(iter)
     else:
-        eta, _lambda, iter = 0.003, 0, 20
+        eta, _lambda, iter = 0.01, 0, 20
     feature_map = utility.DummyFeatureMap.load(utility.get_date_file_path(feature_map_file))
     train_fs = utility.FeatureStream(feature_map, utility.get_date_file_path(train_data_file))
     print "training......"
