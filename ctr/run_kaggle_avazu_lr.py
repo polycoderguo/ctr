@@ -21,7 +21,7 @@ if __name__ == "__main__":
         train_fs.reset()
         model_file = "app_model_lr_v3_{0}_{1}.json".format(eta, iter)
         print "iter {0}......".format(i)
-        alg.train(train_fs, _lambda, eta, report_interval=1000000)
+        alg.train(train_fs, _lambda, eta, report_interval=-1)
         alg.dump_model(utility.get_date_file_path(model_file))
         print "testing......"
         test_fs = utility.FeatureStream(utility.get_date_file_path(feature_map_file), utility.get_date_file_path(test_data_file))
